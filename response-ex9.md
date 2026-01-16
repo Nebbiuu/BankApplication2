@@ -45,9 +45,3 @@ mvn jacoco:report
 # ouvrir le rapport généré
 xdg-open target/site/jacoco/index.html   # (Linux)
 ```
-
-Prochaine(s) étape(s) recommandée(s)
-- Écrire un test pour `loadFromText(String)` : créer un fichier temporaire avec le format attendu par `loadFromText`, appeler la méthode et vérifier le résultat (nombre de comptes chargés / état du gestionnaire). Cela couvrira la logique de parsing/IO actuellement non testée.
-- Ajouter un test pour le constructeur `BankAccount(int,double,double,String,String)` en lui fournissant une chaîne `accountHolder` formatée avec `Person.DELIM`.
-
-Souhaitez-vous que je crée et ajoute automatiquement un test pour `loadFromText(...)` (en créant un fichier temporaire) ou préférez-vous que je teste le constructeur avec la chaîne formattée ?
