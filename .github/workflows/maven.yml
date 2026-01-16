@@ -1,4 +1,4 @@
-name: Java File Report
+name: maven
 
 on:
   push:
@@ -12,46 +12,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Scan Java files and generate report
-        run: |
-          echo "Java File Report" > java-file-report.txt
-          echo "================" >> java-file-report.txt
-          echo "" >> java-file-report.txt
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-          JAVA_FILES=$(find . -name "*.java")
+      - name: Build and Test with Maven
+        # On lance clean, test et package en une fois
+        run: mvn clean test package
 
-          if [ -z "$JAVA_FILES" ]; then
-            echo "ERROR: No .java files found."
-            exit 1
-          fi
-
-          TOTAL_FILES=$(echo "$JAVA_FILES" | wc -l)
-          TOTAL_LINES=0
-
-          echo "Number of .java files: $TOTAL_FILES" >> java-file-report.txt
-          echo "" >> java-file-report.txt
-          echo "Per-file breakdown:" >> java-file-report.txt
-
-          for file in $JAVA_FILES; do
-            LINES=$(wc -l < "$file")
-            TOTAL_LINES=$((TOTAL_LINES + LINES))
-            echo "$file – $LINES" >> java-file-report.txt
-          done
-
-          echo "" >> java-file-report.txt
-          echo "Total lines of code: $TOTAL_LINES" >> java-file-report.txt
-
-      - name: Fail if .class files are committed
-        run: |
-          CLASS_FILES=$(find . -name "*.class")
-          if [ -n "$CLASS_FILES" ]; then
-            echo "ERROR: Compiled .class files found in repository:"
-            echo "$CLASS_FILES"
-            exit 1
-          fi
-
-      - name: Upload java-file-report.txt
+      - name: Upload Build Artifacts (target folder)
         uses: actions/upload-artifact@v4
         with:
-          name: java-file-report
-          path: java-file-report.txt
+          name: maven-build-output
+          # Sauvegarde tout le dossier target (contient le JAR et les rapports de test)
+          path: target/
+          retention-days: 5
