@@ -26,5 +26,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: maven-build-output
-          path: bank-application/target/ 
+          path: .src/target/ 
           retention-days: 5
