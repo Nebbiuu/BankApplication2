@@ -20,14 +20,11 @@ jobs:
           cache: maven
 
       - name: Build and Test with Maven
-        # Remplacer 'bank-application' par le nom RÉEL de votre dossier
-        working-directory: bank-application 
         run: mvn clean test package
 
       - name: Upload Build Artifacts (target folder)
         uses: actions/upload-artifact@v4
         with:
           name: maven-build-output
-          # On pointe vers le dossier target à l'intérieur du sous-dossier
           path: bank-application/target/ 
           retention-days: 5
