@@ -1,38 +1,57 @@
-name: Java CI with Maven
+name: Java File Report
 
 on:
   push:
-    branches: [ "main" ]
   pull_request:
-    branches: [ "main" ]
 
 jobs:
-  build:
+  java-report:
     runs-on: ubuntu-latest
 
     steps:
-    # 1. Récupérer le code source du dépôt
-    - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    # 2. Configurer le JDK (indispensable pour Maven)
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
+      - name: Scan Java files and generate report
+        run: |
+          echo "Java File Report" > java-file-report.txt
+          echo "================" >> java-file-report.txt
+          echo "" >> java-file-report.txt
 
-    # 3. Exécuter les tests (votre demande initiale)
-    - name: Run tests
-      run: mvn clean test
+          JAVA_FILES=$(find . -name "*.java")
 
-    # ... étapes précédentes ...
-    - name: Build with Maven
-      run: mvn package
-      working-directory: bank-application # Remplacez par le nom de votre dossier
+          if [ -z "$JAVA_FILES" ]; then
+            echo "ERROR: No .java files found."
+            exit 1
+          fi
 
-    - name: Upload Build Artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: bank-application-build-folder
-        path: bank-application/target/ # Précisez aussi le chemin ici
+          TOTAL_FILES=$(echo "$JAVA_FILES" | wc -l)
+          TOTAL_LINES=0
+
+          echo "Number of .java files: $TOTAL_FILES" >> java-file-report.txt
+          echo "" >> java-file-report.txt
+          echo "Per-file breakdown:" >> java-file-report.txt
+
+          for file in $JAVA_FILES; do
+            LINES=$(wc -l < "$file")
+            TOTAL_LINES=$((TOTAL_LINES + LINES))
+            echo "$file – $LINES" >> java-file-report.txt
+          done
+
+          echo "" >> java-file-report.txt
+          echo "Total lines of code: $TOTAL_LINES" >> java-file-report.txt
+
+      - name: Fail if .class files are committed
+        run: |
+          CLASS_FILES=$(find . -name "*.class")
+          if [ -n "$CLASS_FILES" ]; then
+            echo "ERROR: Compiled .class files found in repository:"
+            echo "$CLASS_FILES"
+            exit 1
+          fi
+
+      - name: Upload java-file-report.txt
+        uses: actions/upload-artifact@v4
+        with:
+          name: java-file-report
+          path: java-file-report.txt
