@@ -26,14 +26,13 @@ jobs:
     - name: Run tests
       run: mvn clean test
 
-    # 4. Créer le package (JAR)
+    # ... étapes précédentes ...
     - name: Build with Maven
-      run: mvn package -DskipTests # On skip les tests car ils viennent d'être faits au step précédent
+      run: mvn package
+      working-directory: bank-application # Remplacez par le nom de votre dossier
 
-    # 5. Sauvegarder le dossier target/ comme artefact
     - name: Upload Build Artifact
       uses: actions/upload-artifact@v4
       with:
         name: bank-application-build-folder
-        path: target/
-        retention-days: 5
+        path: bank-application/target/ # Précisez aussi le chemin ici
